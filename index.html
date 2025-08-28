@@ -6,6 +6,7 @@
     <title>XSS Payload Encoder/Decoder | Security Research Tool</title>
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; frame-src 'none';">
     <style>
+        /* --- General Styling & Variables --- */
         * {
             margin: 0;
             padding: 0;
@@ -43,6 +44,7 @@
             padding: 1rem;
         }
 
+        /* --- Header & Disclaimer --- */
         .header {
             text-align: center;
             margin-bottom: 2rem;
@@ -75,18 +77,12 @@
             color: var(--text-secondary);
         }
 
+        /* --- Main Layout --- */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 1.5rem;
             margin-bottom: 2rem;
-        }
-
-        @media (min-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 2rem;
-            }
         }
 
         .panel {
@@ -95,12 +91,8 @@
             padding: 1rem;
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
-        }
-
-        @media (min-width: 768px) {
-            .panel {
-                padding: 1.5rem;
-            }
+            display: flex;
+            flex-direction: column;
         }
 
         .panel-header {
@@ -123,7 +115,8 @@
             color: var(--text-muted);
         }
 
-        textarea {
+        /* --- Input/Output Areas --- */
+        textarea, #output-container {
             width: 100%;
             min-height: 200px;
             background: var(--bg-primary);
@@ -135,12 +128,31 @@
             font-size: 0.875rem;
             resize: vertical;
             transition: border-color 0.2s;
+            flex-grow: 1;
+        }
+        
+        #output-container {
+            overflow-y: auto;
         }
 
-        @media (min-width: 768px) {
-            textarea {
-                min-height: 300px;
-            }
+        .output-group {
+            margin-bottom: 1rem;
+        }
+        .output-group:last-child {
+            margin-bottom: 0;
+        }
+        .output-group h5 {
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .output-group pre {
+            background: var(--bg-tertiary);
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
         }
 
         textarea:focus {
@@ -148,11 +160,7 @@
             border-color: var(--accent);
         }
 
-        textarea[readonly] {
-            background: var(--bg-tertiary);
-            cursor: default;
-        }
-
+        /* --- Controls & Buttons --- */
         .controls {
             margin-top: 1rem;
             display: flex;
@@ -166,13 +174,7 @@
             flex-wrap: wrap;
         }
 
-        @media (min-width: 768px) {
-            .control-row {
-                gap: 1rem;
-            }
-        }
-
-        select, button {
+        button {
             padding: 0.75rem 1rem;
             border: 1px solid var(--border);
             border-radius: 0.5rem;
@@ -182,77 +184,23 @@
             transition: all 0.2s;
             flex: 1;
             min-width: 0;
-        }
-
-        @media (min-width: 768px) {
-            select, button {
-                flex: none;
-                min-width: 120px;
-            }
-            
-            select {
-                min-width: 200px;
-            }
-        }
-
-        select:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        button {
             cursor: pointer;
             font-weight: 500;
         }
 
-        .btn-primary {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
+        .btn-primary { background: var(--accent); border-color: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+        .btn-secondary { background: var(--bg-tertiary); border-color: var(--border); }
+        .btn-secondary:hover { background: var(--border); }
+        .btn-success { background: var(--success); border-color: var(--success); color: white; }
+        .btn-success:hover { background: #059669; border-color: #059669; }
 
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            border-color: var(--accent-hover);
-        }
-
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            border-color: var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .btn-success {
-            background: var(--success);
-            border-color: var(--success);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-            border-color: #059669;
-        }
-
+        /* --- Advanced Options Grid --- */
         .options-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 1rem;
             margin-top: 1rem;
-        }
-
-        @media (min-width: 640px) {
-            .options-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .options-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
         }
 
         .option-group {
@@ -297,18 +245,14 @@
             line-height: 1.4;
         }
 
+        /* --- Encoding Chain & Toast --- */
         .encoding-chain {
             background: var(--bg-secondary);
             border-radius: 0.75rem;
             padding: 1rem;
             margin-top: 2rem;
+            margin-bottom: 2rem;
             border: 1px solid var(--border);
-        }
-
-        @media (min-width: 768px) {
-            .encoding-chain {
-                padding: 1.5rem;
-            }
         }
 
         .chain-header {
@@ -356,8 +300,39 @@
             transition: transform 0.3s ease;
             word-wrap: break-word;
         }
+        
+        .toast.show {
+            transform: translateY(0);
+        }
+        .toast.error { background: var(--error); }
+        .toast.warning { background: var(--warning); }
 
+        /* --- Responsive Design --- */
+        
+        /* Tablet & Small Desktop */
+        @media (min-width: 768px) {
+            .panel { padding: 1.5rem; }
+            textarea, #output-container { min-height: 300px; }
+            .control-row { gap: 1rem; }
+            button { flex: 1; }
+        }
+
+        /* Desktop */
+        @media (min-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+            .options-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        /* Small Tablet */
         @media (min-width: 640px) {
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
             .toast {
                 top: 2rem;
                 right: 2rem;
@@ -365,92 +340,8 @@
                 max-width: 400px;
                 transform: translateX(100%);
             }
-            
             .toast.show {
                 transform: translateX(0);
-            }
-        }
-
-        .toast.show {
-            transform: translateY(0);
-        }
-
-        .toast.error {
-            background: var(--error);
-        }
-
-        .toast.warning {
-            background: var(--warning);
-        }
-
-        /* Mobile optimizations */
-        @media (max-width: 639px) {
-            .container {
-                padding: 0.5rem;
-            }
-
-            .header {
-                margin-bottom: 1.5rem;
-                padding-bottom: 1rem;
-            }
-
-            .main-grid {
-                gap: 1rem;
-                margin-bottom: 1.5rem;
-            }
-
-            .panel {
-                border-radius: 0.5rem;
-            }
-
-            .control-row {
-                flex-direction: column;
-            }
-
-            .control-row > * {
-                flex: none;
-            }
-
-            .options-grid {
-                margin-top: 1.5rem;
-            }
-
-            .encoding-chain {
-                margin-top: 1.5rem;
-            }
-
-            .chain-steps {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .chain-arrow {
-                transform: rotate(90deg);
-                align-self: center;
-            }
-        }
-
-        /* Accessibility improvements */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                transition: none !important;
-            }
-        }
-
-        /* Focus indicators for keyboard navigation */
-        button:focus,
-        select:focus,
-        textarea:focus,
-        input:focus {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
-        }
-
-        /* High contrast mode support */
-        @media (prefers-contrast: high) {
-            :root {
-                --border: #ffffff;
-                --text-secondary: #ffffff;
             }
         }
     </style>
@@ -462,10 +353,15 @@
             <p>Professional Security Research Tool for Bug Bounty Hunters</p>
         </header>
 
-        <div class="disclaimer">
-            <strong>⚠️ Legal Notice:</strong> This tool is designed for authorized security testing and educational purposes only. 
-            Users are responsible for ensuring compliance with applicable laws and obtaining proper authorization before testing any systems.
+        <!-- <div class="disclaimer"> -->
+              <!-- Encoding Chain -->
+        <div class="encoding-chain">
+            <div class="chain-header">Encoding Chain</div>
+            <div class="chain-steps" id="encodingChain">
+                <span class="chain-step">No operations performed</span>
+            </div>
         </div>
+        <!-- </div> -->
 
         <div class="main-grid">
             <!-- Input Panel -->
@@ -478,32 +374,8 @@
                 
                 <div class="controls">
                     <div class="control-row">
-                        <select id="operationType">
-                            <option value="encode">Encode</option>
-                            <option value="decode">Decode</option>
-                        </select>
-                        <select id="encodingType">
-                            <option value="none">No Encoding (Advanced Options Only)</option>
-                            <optgroup label="Basic Encoding">
-                                <option value="url">URL Encoding</option>
-                                <option value="html-entity">HTML Entity</option>
-                                <option value="double">Double Encoding</option>
-                                <option value="base64">Base64 Standard</option>
-                                <option value="base64url">Base64 URL-Safe</option>
-                            </optgroup>
-                            <optgroup label="ASCII Variations">
-                                <option value="ascii-octal">ASCII Octal</option>
-                                <option value="ascii-decimal">ASCII Decimal</option>
-                                <option value="ascii-hex">ASCII Hexadecimal</option>
-                            </optgroup>
-                            <optgroup label="Unicode">
-                                <option value="unicode-utf8">Unicode UTF-8</option>
-                                <option value="unicode-utf16">Unicode UTF-16</option>
-                            </optgroup>
-                        </select>
-                    </div>
-                    <div class="control-row">
-                        <button type="button" class="btn-primary" id="processBtn">Process</button>
+                        <button type="button" class="btn-primary" id="encodeBtn">Encode</button>
+                        <button type="button" class="btn-success" id="decodeBtn">Auto-Decode</button>
                         <button type="button" class="btn-secondary" id="clearBtn">Clear All</button>
                     </div>
                 </div>
@@ -513,14 +385,14 @@
             <div class="panel">
                 <div class="panel-header">
                     <h3 class="panel-title">Output</h3>
-                    <span class="char-count" id="outputCount">0 chars</span>
+                     <span class="char-count" id="outputCount">0 chars</span>
                 </div>
-                <textarea id="outputText" readonly placeholder="Processed output will appear here..."></textarea>
-                
+                <div id="output-container">
+                    <span style="color: var(--text-muted);">Processed output will appear here...</span>
+                </div>
                 <div class="controls">
                     <div class="control-row">
-                        <button type="button" class="btn-success" id="copyBtn">Copy Result</button>
-                        <button type="button" class="btn-secondary" id="downloadBtn">Download</button>
+                        <button type="button" class="btn-secondary" id="copyAllBtn">Copy All Results</button>
                         <button type="button" class="btn-secondary" id="swapBtn">Swap Input/Output</button>
                     </div>
                 </div>
@@ -532,99 +404,48 @@
             <div class="option-group">
                 <h4>Case Variations</h4>
                 <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="caseCapitalize">
-                        <label for="caseCapitalize">Capitalize First Letter</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="caseUpper">
-                        <label for="caseUpper">UPPERCASE</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="caseMixed">
-                        <label for="caseMixed">MiXeD cAsE</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="caseRandom">
-                        <label for="caseRandom">Random Case</label>
-                    </div>
+                    <div class="checkbox-item"><input type="checkbox" id="caseCapitalize"><label for="caseCapitalize">Capitalize First Letter</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="caseUpper"><label for="caseUpper">UPPERCASE</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="caseMixed"><label for="caseMixed">MiXeD cAsE</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="caseRandom"><label for="caseRandom">Random Case</label></div>
                 </div>
             </div>
 
             <div class="option-group">
-                <h4>Whitespace Embedding</h4>
+                <h4>Whitespace & Karakter Khusus</h4>
                 <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="wsTab">
-                        <label for="wsTab">Tab Insertion</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="wsNewline">
-                        <label for="wsNewline">Newline Insertion</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="wsUnicode">
-                        <label for="wsUnicode">Unicode Spaces</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="wsMultiple">
-                        <label for="wsMultiple">Multiple Spaces</label>
-                    </div>
+                    <div class="checkbox-item"><input type="checkbox" id="wsSpace"><label for="wsSpace">Space to &amp;nbsp;</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="wsTab"><label for="wsTab">Space to Tab</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="wsNewline"><label for="wsNewline">Space to Newline</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="wsCarriageReturn"><label for="wsCarriageReturn">Space to Carriage Return</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="wsFormFeed"><label for="wsFormFeed">Space to Form Feed</label></div>
                 </div>
             </div>
 
             <div class="option-group">
                 <h4>Bypass Techniques</h4>
                 <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="splitKeyword">
-                        <label for="splitKeyword">Split Keywords (Trojan)</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="attrInjection">
-                        <label for="attrInjection">Non-required Attributes</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="commentInsert">
-                        <label for="commentInsert">Comment Insertion</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="zeroWidth">
-                        <label for="zeroWidth">Zero-width Characters</label>
-                    </div>
+                    <div class="checkbox-item"><input type="checkbox" id="splitKeyword"><label for="splitKeyword">Split Keywords (Trojan)</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="attrInjection"><label for="attrInjection">Non-required Attributes</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="commentInsert"><label for="commentInsert">Comment Insertion</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="zeroWidth"><label for="zeroWidth">Zero-width Characters</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="stringConcat"><label for="stringConcat">String Concat</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="fromCharCode"><label for="fromCharCode">FromCharCode Obfuscation</label></div>
                 </div>
             </div>
 
             <div class="option-group">
                 <h4>Advanced Options</h4>
                 <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="homograph">
-                        <label for="homograph">Homograph Substitution</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="rtlOverride">
-                        <label for="rtlOverride">RTL Override</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="tripleEncode">
-                        <label for="tripleEncode">Triple Encoding</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="preserveLength">
-                        <label for="preserveLength">Preserve Length</label>
-                    </div>
+                    <div class="checkbox-item"><input type="checkbox" id="homograph"><label for="homograph">Homograph Substitution</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="rtlOverride"><label for="rtlOverride">RTL Override</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="tripleEncode"><label for="tripleEncode">Triple Encoding</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="preserveLength"><label for="preserveLength">Preserve Length</label></div>
                 </div>
             </div>
         </div>
 
-        <!-- Encoding Chain -->
-        <div class="encoding-chain">
-            <div class="chain-header">Encoding Chain</div>
-            <div class="chain-steps" id="encodingChain">
-                <span class="chain-step">No operations performed</span>
-            </div>
-        </div>
+      
     </div>
 
     <!-- Toast Notification -->
@@ -640,13 +461,11 @@
 
             initializeElements() {
                 this.inputText = document.getElementById('inputText');
-                this.outputText = document.getElementById('outputText');
-                this.operationType = document.getElementById('operationType');
-                this.encodingType = document.getElementById('encodingType');
-                this.processBtn = document.getElementById('processBtn');
+                this.outputContainer = document.getElementById('output-container');
+                this.encodeBtn = document.getElementById('encodeBtn');
+                this.decodeBtn = document.getElementById('decodeBtn');
                 this.clearBtn = document.getElementById('clearBtn');
-                this.copyBtn = document.getElementById('copyBtn');
-                this.downloadBtn = document.getElementById('downloadBtn');
+                this.copyAllBtn = document.getElementById('copyAllBtn');
                 this.swapBtn = document.getElementById('swapBtn');
                 this.inputCount = document.getElementById('inputCount');
                 this.outputCount = document.getElementById('outputCount');
@@ -656,465 +475,225 @@
 
             bindEvents() {
                 this.inputText.addEventListener('input', () => this.updateCharCount());
-                this.outputText.addEventListener('input', () => this.updateCharCount());
-                this.processBtn.addEventListener('click', () => this.processPayload());
+                this.encodeBtn.addEventListener('click', () => this.runEncoder());
+                this.decodeBtn.addEventListener('click', () => this.runDecoder());
                 this.clearBtn.addEventListener('click', () => this.clearAll());
-                this.copyBtn.addEventListener('click', () => this.copyToClipboard());
-                this.downloadBtn.addEventListener('click', () => this.downloadResult());
+                this.copyAllBtn.addEventListener('click', () => this.copyAllResults());
                 this.swapBtn.addEventListener('click', () => this.swapInputOutput());
             }
 
-            // Input sanitization - critical for security
+            // Input sanitization
             sanitizeInput(input) {
                 if (typeof input !== 'string') return '';
-                
-                // Length limit to prevent abuse
                 if (input.length > 50000) {
                     input = input.substring(0, 50000);
                     this.showToast('Input truncated to 50,000 characters for safety', 'warning');
                 }
-                
                 return input;
-            }
-
-            // Safe text-only display - never use innerHTML
-            safeSetText(element, text) {
-                if (element && typeof text === 'string') {
-                    element.textContent = text;
-                }
             }
 
             updateCharCount() {
                 const inputLength = this.inputText.value.length;
-                const outputLength = this.outputText.value.length;
-                
-                this.safeSetText(this.inputCount, `${inputLength} chars`);
-                this.safeSetText(this.outputCount, `${outputLength} chars`);
+                this.inputCount.textContent = `${inputLength} chars`;
+                const outputText = this.outputContainer.innerText;
+                this.outputCount.textContent = `${outputText.length} chars`;
             }
+            
+            // --- ENCODING LOGIC ---
 
-            // Encoding functions - all return strings safely
-            encodeURL(text) {
-                return encodeURIComponent(text);
-            }
-
-            decodeURL(text) {
-                try {
-                    return decodeURIComponent(text);
-                } catch (e) {
-                    throw new Error('Invalid URL encoding');
+            runEncoder() {
+                let input = this.sanitizeInput(this.inputText.value);
+                if (!input) {
+                    this.showToast('Please enter some input text', 'warning');
+                    return;
                 }
-            }
 
-            encodeHTMLEntity(text) {
-                return text.replace(/[&<>"']/g, (char) => {
-                    const entities = {
-                        '&': '&amp;',
-                        '<': '&lt;',
-                        '>': '&gt;',
-                        '"': '&quot;',
-                        "'": '&#x27;'
-                    };
-                    return entities[char] || char;
-                });
-            }
+                // Apply advanced options first
+                let modifiedInput = this.applyAdvancedOptions(input);
 
-            decodeHTMLEntity(text) {
-                const entities = {
-                    '&amp;': '&',
-                    '&lt;': '<',
-                    '&gt;': '>',
-                    '&quot;': '"',
-                    '&#x27;': "'",
-                    '&#39;': "'"
+                const encodingMethods = {
+                    'URL Encoding': this.encodeURL,
+                    'HTML Entity': this.encodeHTMLEntity,
+                    'Double URL Encoding': this.encodeDoubleURL,
+                    'Base64 Standard': this.encodeBase64,
+                    'Base64 URL-Safe': this.encodeBase64URL,
+                    'ASCII Octal': this.encodeASCIIOctal,
+                    'ASCII Decimal': this.encodeASCIIDecimal,
+                    'ASCII Hexadecimal': this.encodeASCIIHex,
+                    'Unicode UTF-16': this.encodeUnicodeUTF16,
                 };
                 
-                return text.replace(/&[a-zA-Z0-9#x]+;/g, (entity) => {
-                    if (entities[entity]) return entities[entity];
+                if (document.getElementById('tripleEncode').checked) {
+                     encodingMethods['Triple URL Encoding'] = (text) => this.encodeURL(this.encodeURL(this.encodeURL(text)));
+                }
+
+                let results = {};
+
+                // Add the new "variations only" result at the top
+                const shortInput = input.length > 20 ? input.substring(0, 20) + '...' : input;
+                results[`'${shortInput}' + Variations`] = modifiedInput;
+
+                for (const [name, func] of Object.entries(encodingMethods)) {
+                    try {
+                        // Each encoding method is applied to the already modified input
+                        results[name] = func.call(this, modifiedInput);
+                    } catch (e) {
+                        results[name] = `Error: ${e.message}`;
+                    }
+                }
+                
+                this.renderEncodeResults(results);
+                this.updateEncodingChain('ENCODE', 'ALL METHODS + VARIATIONS');
+                this.showToast('Encoding complete', 'success');
+            }
+            
+            renderEncodeResults(results) {
+                this.outputContainer.innerHTML = '';
+                for (const [name, value] of Object.entries(results)) {
+                    const group = document.createElement('div');
+                    group.className = 'output-group';
+
+                    const title = document.createElement('h5');
+                    title.textContent = name;
                     
-                    // Handle numeric entities
-                    const numMatch = entity.match(/&#(\d+);/);
-                    if (numMatch) {
-                        return String.fromCharCode(parseInt(numMatch[1], 10));
+                    const pre = document.createElement('pre');
+                    pre.textContent = value;
+
+                    group.appendChild(title);
+                    group.appendChild(pre);
+                    this.outputContainer.appendChild(group);
+                }
+                this.updateCharCount();
+            }
+
+            // --- DECODING LOGIC ---
+
+            runDecoder() {
+                let input = this.sanitizeInput(this.inputText.value);
+                if (!input) {
+                    this.showToast('Please enter some input text', 'warning');
+                    return;
+                }
+                
+                // First, normalize all possible whitespace variations to a standard space
+                input = input.replace(/[\t\n\r\f\u00A0]/g, ' ');
+
+                const detectionOrder = [
+                    { name: 'Base64 URL-Safe', func: this.decodeBase64URL, regex: /^[A-Za-z0-9\-_]+$/ },
+                    { name: 'Base64 Standard', func: this.decodeBase64, regex: /^[A-Za-z0-9+/=]+$/ },
+                    { name: 'Double URL', func: this.decodeDoubleURL, regex: /%25/ }, // Contains %25
+                    { name: 'URL', func: this.decodeURL, regex: /%/ },
+                    { name: 'HTML Entity', func: this.decodeHTMLEntity, regex: /&(#?[\w\d]+);/ },
+                    { name: 'ASCII Hexadecimal', func: this.decodeASCIIHex, regex: /(\\x[0-9a-fA-F]{2})+/ },
+                    { name: 'ASCII Octal', func: this.decodeASCIIOctal, regex: /(\\[0-7]{1,3})+/ },
+                    { name: 'ASCII Decimal', func: this.decodeASCIIDecimal, regex: /(&#\d+;)+/ },
+                    { name: 'Unicode UTF-16', func: this.decodeUnicodeUTF16, regex: /(\\u\{[0-9a-fA-F]+\})+/ },
+                ];
+
+                for (const decoder of detectionOrder) {
+                    if (decoder.regex && !decoder.regex.test(input)) {
+                        continue;
                     }
-                    
-                    // Handle hex entities
-                    const hexMatch = entity.match(/&#x([0-9a-fA-F]+);/);
-                    if (hexMatch) {
-                        return String.fromCharCode(parseInt(hexMatch[1], 16));
+                    try {
+                        const result = decoder.func.call(this, input);
+                        if (result !== input && result.length > 0) {
+                            this.renderDecodeResult(decoder.name, result);
+                            this.updateEncodingChain('DECODE', `AUTO-DETECTED: ${decoder.name}`);
+                            this.showToast(`Successfully decoded as ${decoder.name}`, 'success');
+                            return;
+                        }
+                    } catch (e) {
+                        // Ignore errors
                     }
-                    
-                    return entity;
-                });
-            }
-
-            encodeDoubleURL(text) {
-                return this.encodeURL(this.encodeURL(text));
-            }
-
-            decodeDoubleURL(text) {
-                return this.decodeURL(this.decodeURL(text));
-            }
-
-            encodeBase64(text) {
-                try {
-                    return btoa(unescape(encodeURIComponent(text)));
-                } catch (e) {
-                    throw new Error('Base64 encoding failed');
-                }
-            }
-
-            decodeBase64(text) {
-                try {
-                    return decodeURIComponent(escape(atob(text)));
-                } catch (e) {
-                    throw new Error('Invalid Base64 encoding');
-                }
-            }
-
-            encodeBase64URL(text) {
-                return this.encodeBase64(text)
-                    .replace(/\+/g, '-')
-                    .replace(/\//g, '_')
-                    .replace(/=/g, '');
-            }
-
-            decodeBase64URL(text) {
-                // Add padding back
-                let padded = text;
-                while (padded.length % 4) {
-                    padded += '=';
-                }
-                // Convert back to standard Base64
-                const standard = padded.replace(/-/g, '+').replace(/_/g, '/');
-                return this.decodeBase64(standard);
-            }
-
-            encodeASCIIOctal(text) {
-                return text.split('').map(char => '\\' + char.charCodeAt(0).toString(8)).join('');
-            }
-
-            decodeASCIIOctal(text) {
-                return text.replace(/\\([0-7]+)/g, (match, octal) => {
-                    return String.fromCharCode(parseInt(octal, 8));
-                });
-            }
-
-            encodeASCIIDecimal(text) {
-                return text.split('').map(char => `&#${char.charCodeAt(0)};`).join('');
-            }
-
-            decodeASCIIDecimal(text) {
-                return text.replace(/&#(\d+);/g, (match, decimal) => {
-                    return String.fromCharCode(parseInt(decimal, 10));
-                });
-            }
-
-            encodeASCIIHex(text) {
-                return text.split('').map(char => '\\x' + char.charCodeAt(0).toString(16).padStart(2, '0')).join('');
-            }
-
-            decodeASCIIHex(text) {
-                return text.replace(/\\x([0-9a-fA-F]{2})/g, (match, hex) => {
-                    return String.fromCharCode(parseInt(hex, 16));
-                });
-            }
-
-            encodeUnicodeUTF8(text) {
-                return text.split('').map(char => {
-                    const code = char.charCodeAt(0);
-                    if (code < 128) {
-                        return char;
-                    }
-                    return '\\u' + code.toString(16).padStart(4, '0');
-                }).join('');
-            }
-
-            decodeUnicodeUTF8(text) {
-                return text.replace(/\\u([0-9a-fA-F]{4})/g, (match, unicode) => {
-                    return String.fromCharCode(parseInt(unicode, 16));
-                });
-            }
-
-            encodeUnicodeUTF16(text) {
-                return text.split('').map(char => {
-                    const code = char.charCodeAt(0);
-                    return '\\u{' + code.toString(16) + '}';
-                }).join('');
-            }
-
-            decodeUnicodeUTF16(text) {
-                return text.replace(/\\u\{([0-9a-fA-F]+)\}/g, (match, unicode) => {
-                    return String.fromCharCode(parseInt(unicode, 16));
-                });
-            }
-
-            // Apply advanced options safely
-            applyAdvancedOptions(text) {
-                let result = text;
-
-                // Case variations
-                if (document.getElementById('caseCapitalize').checked) {
-                    result = result.charAt(0).toUpperCase() + result.slice(1);
                 }
                 
-                if (document.getElementById('caseUpper').checked) {
-                    result = result.toUpperCase();
-                }
-                
-                if (document.getElementById('caseMixed').checked) {
-                    result = result.split('').map((char, i) => 
-                        i % 2 === 0 ? char.toLowerCase() : char.toUpperCase()
-                    ).join('');
-                }
-                
-                if (document.getElementById('caseRandom').checked) {
-                    result = result.split('').map(char => 
-                        Math.random() > 0.5 ? char.toUpperCase() : char.toLowerCase()
-                    ).join('');
-                }
-
-                // Whitespace embedding
-                if (document.getElementById('wsTab').checked) {
-                    result = result.replace(/\s/g, '\t');
-                }
-                
-                if (document.getElementById('wsNewline').checked) {
-                    result = result.replace(/\s/g, '\n');
-                }
-                
-                if (document.getElementById('wsUnicode').checked) {
-                    result = result.replace(/\s/g, '\u2000'); // En quad
-                }
-                
-                if (document.getElementById('wsMultiple').checked) {
-                    result = result.replace(/\s/g, '  ');
-                }
-
-                // Bypass techniques
-                if (document.getElementById('splitKeyword').checked) {
-                    result = result.replace(/script/gi, 'scr<!---->ipt');
-                    result = result.replace(/alert/gi, 'al<!---->ert');
-                    result = result.replace(/eval/gi, 'ev<!---->al');
-                }
-                
-                if (document.getElementById('attrInjection').checked) {
-                    result = result.replace(/<script/gi, '<sc/ri/pt');
-                    result = result.replace(/<img/gi, '<img/src/onerror');
-                }
-                
-                if (document.getElementById('commentInsert').checked) {
-                    result = result.replace(/</g, '</**/');
-                    result = result.replace(/>/g, '/**/>');
-                }
-                
-                if (document.getElementById('zeroWidth').checked) {
-                    result = result.split('').join('\u200B'); // Zero-width space
-                }
-
-                // Advanced options
-                if (document.getElementById('homograph').checked) {
-                    const homographs = {
-                        'a': 'а', 'e': 'е', 'o': 'о', 'p': 'р',
-                        'c': 'с', 'x': 'х', 'y': 'у'
-                    };
-                    result = result.replace(/[aeopcxy]/gi, char => homographs[char.toLowerCase()] || char);
-                }
-                
-                if (document.getElementById('rtlOverride').checked) {
-                    result = '\u202E' + result + '\u202C'; // RTL override
-                }
-
-                return result;
+                this.renderDecodeResult('Detection Failed', 'Could not automatically determine the encoding type.');
+                this.showToast('Auto-detection failed', 'error');
             }
 
-            processPayload() {
-                try {
-                    let input = this.sanitizeInput(this.inputText.value);
-                    if (!input) {
-                        this.showToast('Please enter some input text', 'warning');
-                        return;
-                    }
+            renderDecodeResult(method, result) {
+                this.outputContainer.innerHTML = '';
+                const group = document.createElement('div');
+                group.className = 'output-group';
 
-                    const operation = this.operationType.value;
-                    const encoding = this.encodingType.value;
-                    
-                    let result = input;
+                const title = document.createElement('h5');
+                title.textContent = `Detected Method: ${method}`;
+                
+                const pre = document.createElement('pre');
+                pre.textContent = result;
 
-                    // Apply main encoding/decoding
-                    switch (encoding) {
-                        case 'none':
-                            // No encoding/decoding, just pass through
-                            break;
-                        case 'url':
-                            result = operation === 'encode' ? this.encodeURL(result) : this.decodeURL(result);
-                            break;
-                        case 'html-entity':
-                            result = operation === 'encode' ? this.encodeHTMLEntity(result) : this.decodeHTMLEntity(result);
-                            break;
-                        case 'double':
-                            result = operation === 'encode' ? this.encodeDoubleURL(result) : this.decodeDoubleURL(result);
-                            break;
-                        case 'base64':
-                            result = operation === 'encode' ? this.encodeBase64(result) : this.decodeBase64(result);
-                            break;
-                        case 'base64url':
-                            result = operation === 'encode' ? this.encodeBase64URL(result) : this.decodeBase64URL(result);
-                            break;
-                        case 'ascii-octal':
-                            result = operation === 'encode' ? this.encodeASCIIOctal(result) : this.decodeASCIIOctal(result);
-                            break;
-                        case 'ascii-decimal':
-                            result = operation === 'encode' ? this.encodeASCIIDecimal(result) : this.decodeASCIIDecimal(result);
-                            break;
-                        case 'ascii-hex':
-                            result = operation === 'encode' ? this.encodeASCIIHex(result) : this.decodeASCIIHex(result);
-                            break;
-                        case 'unicode-utf8':
-                            result = operation === 'encode' ? this.encodeUnicodeUTF8(result) : this.decodeUnicodeUTF8(result);
-                            break;
-                        case 'unicode-utf16':
-                            result = operation === 'encode' ? this.encodeUnicodeUTF16(result) : this.decodeUnicodeUTF16(result);
-                            break;
-                        default:
-                            throw new Error('Unknown encoding type');
-                    }
-
-                    // Apply advanced options (for both encode operations and "none" option)
-                    if (operation === 'encode' || encoding === 'none') {
-                        result = this.applyAdvancedOptions(result);
-                    }
-
-                    // Triple encoding option
-                    if (document.getElementById('tripleEncode').checked && operation === 'encode') {
-                        result = this.encodeURL(this.encodeURL(result));
-                    }
-
-                    // Safe output - NEVER use innerHTML
-                    this.outputText.value = result;
-                    this.updateCharCount();
-                    this.updateEncodingChain(operation, encoding);
-                    this.showToast('Processing completed successfully', 'success');
-
-                } catch (error) {
-                    this.showToast(`Error: ${error.message}`, 'error');
-                    console.error('Processing error:', error);
-                }
+                group.appendChild(title);
+                group.appendChild(pre);
+                this.outputContainer.appendChild(group);
+                this.updateCharCount();
             }
 
-            updateEncodingChain(operation, encoding) {
-                let step;
-                
-                if (encoding === 'none') {
-                    step = 'ADVANCED OPTIONS ONLY';
-                } else {
-                    step = `${operation.toUpperCase()}: ${encoding.replace('-', ' ').toUpperCase()}`;
-                }
-                
+
+            // --- UTILITY & HELPER FUNCTIONS ---
+
+            updateEncodingChain(operation, method) {
+                const step = `${operation}: ${method.toUpperCase()}`;
                 this.encodingHistory.push(step);
-
-                // Keep only last 5 operations
-                if (this.encodingHistory.length > 5) {
-                    this.encodingHistory = this.encodingHistory.slice(-5);
-                }
-
+                if (this.encodingHistory.length > 5) { this.encodingHistory.shift(); }
                 this.renderEncodingChain();
             }
 
             renderEncodingChain() {
-                const chainContainer = this.encodingChain;
-                chainContainer.innerHTML = '';
-
+                this.encodingChain.innerHTML = '';
                 if (this.encodingHistory.length === 0) {
-                    const noOps = document.createElement('span');
-                    noOps.className = 'chain-step';
-                    noOps.textContent = 'No operations performed';
-                    chainContainer.appendChild(noOps);
+                    this.encodingChain.innerHTML = '<span class="chain-step">No operations performed</span>';
                     return;
                 }
-
                 this.encodingHistory.forEach((step, index) => {
                     if (index > 0) {
                         const arrow = document.createElement('span');
                         arrow.className = 'chain-arrow';
                         arrow.textContent = '→';
-                        chainContainer.appendChild(arrow);
+                        this.encodingChain.appendChild(arrow);
                     }
-
                     const stepElement = document.createElement('span');
                     stepElement.className = 'chain-step';
                     stepElement.textContent = step;
-                    chainContainer.appendChild(stepElement);
+                    this.encodingChain.appendChild(stepElement);
                 });
             }
 
             clearAll() {
                 this.inputText.value = '';
-                this.outputText.value = '';
+                this.outputContainer.innerHTML = '<span style="color: var(--text-muted);">Processed output will appear here...</span>';
                 this.encodingHistory = [];
                 this.renderEncodingChain();
                 this.updateCharCount();
-
-                // Clear all checkboxes
-                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach(checkbox => checkbox.checked = false);
-
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
                 this.showToast('All data cleared', 'success');
             }
 
-            async copyToClipboard() {
-                try {
-                    if (!this.outputText.value) {
-                        this.showToast('No output to copy', 'warning');
-                        return;
-                    }
-
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        await navigator.clipboard.writeText(this.outputText.value);
-                        this.showToast('Copied to clipboard successfully', 'success');
-                    } else {
-                        // Fallback for older browsers
-                        this.outputText.select();
-                        document.execCommand('copy');
-                        this.showToast('Copied to clipboard', 'success');
-                    }
-                } catch (error) {
-                    this.showToast('Failed to copy to clipboard', 'error');
-                    console.error('Copy error:', error);
-                }
-            }
-
-            downloadResult() {
-                if (!this.outputText.value) {
-                    this.showToast('No output to download', 'warning');
+            async copyAllResults() {
+                const groups = this.outputContainer.querySelectorAll('.output-group');
+                if (groups.length === 0) {
+                    this.showToast('No output to copy', 'warning');
                     return;
                 }
-
+                let allText = '';
+                groups.forEach(group => {
+                    const title = group.querySelector('h5').innerText.trim();
+                    const value = group.querySelector('pre').innerText;
+                    allText += `${title}:\n${value}\n\n`;
+                });
                 try {
-                    const blob = new Blob([this.outputText.value], { type: 'text/plain' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `encoded-payload-${Date.now()}.txt`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
-                    this.showToast('File downloaded successfully', 'success');
+                    await navigator.clipboard.writeText(allText.trim());
+                    this.showToast('All results copied', 'success');
                 } catch (error) {
-                    this.showToast('Failed to download file', 'error');
-                    console.error('Download error:', error);
+                    this.showToast('Failed to copy', 'error');
                 }
             }
 
             swapInputOutput() {
                 const inputValue = this.inputText.value;
-                const outputValue = this.outputText.value;
-                
+                const outputValue = this.outputContainer.innerText;
                 this.inputText.value = outputValue;
-                this.outputText.value = inputValue;
+                this.outputContainer.innerHTML = `<div class="output-group"><pre>${inputValue}</pre></div>`;
                 this.updateCharCount();
-                
                 this.showToast('Input and output swapped', 'success');
             }
 
@@ -1122,29 +701,76 @@
                 this.toast.textContent = message;
                 this.toast.className = `toast ${type}`;
                 this.toast.classList.add('show');
+                setTimeout(() => this.toast.classList.remove('show'), 3000);
+            }
 
-                // Hide toast after 3 seconds
-                setTimeout(() => {
-                    this.toast.classList.remove('show');
-                }, 3000);
+            // --- Encoding/Decoding Methods ---
+            encodeURL(text) { return encodeURIComponent(text); }
+            decodeURL(text) { try { return decodeURIComponent(text.replace(/\+/g, ' ')); } catch (e) { throw new Error('Invalid URL'); } }
+            encodeHTMLEntity(text) { 
+                return text.replace(/[&<>"'\t\n\r\f ]/g, (char) => ({
+                    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#x27;', ' ':'&#32;', 
+                    '\t':'&#9;', '\n':'&#10;', '\r':'&#13;', '\f':'&#12;'
+                })[char] || char);
+            }
+            decodeHTMLEntity(text) { const el = document.createElement('textarea'); el.innerHTML = text; return el.value; }
+            encodeDoubleURL(text) { return this.encodeURL(this.encodeURL(text)); }
+            decodeDoubleURL(text) { return this.decodeURL(this.decodeURL(text)); }
+            encodeBase64(text) { try { return btoa(unescape(encodeURIComponent(text))); } catch (e) { throw new Error('Base64 failed'); } }
+            decodeBase64(text) { try { return decodeURIComponent(escape(atob(text.replace(/[^A-Za-z0-9+/=]/g, '')))); } catch (e) { throw new Error('Invalid Base64'); } }
+            encodeBase64URL(text) { return this.encodeBase64(text).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''); }
+            decodeBase64URL(text) { let padded = text.replace(/-/g, '+').replace(/_/g, '/'); while (padded.length % 4) { padded += '='; } return this.decodeBase64(padded); }
+            encodeASCIIOctal(text) { return text.split('').map(char => '\\' + char.charCodeAt(0).toString(8)).join(''); }
+            decodeASCIIOctal(text) { return text.replace(/\\([0-7]{1,3})/g, (_, octal) => String.fromCharCode(parseInt(octal, 8))); }
+            encodeASCIIDecimal(text) { return text.split('').map(char => `&#${char.charCodeAt(0)};`).join(''); }
+            decodeASCIIDecimal(text) { return text.replace(/&#(\d+);/g, (_, decimal) => String.fromCharCode(parseInt(decimal, 10))); }
+            encodeASCIIHex(text) { return text.split('').map(char => '\\x' + char.charCodeAt(0).toString(16).padStart(2, '0')).join(''); }
+            decodeASCIIHex(text) { return text.replace(/\\x([0-9a-fA-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16))); }
+            encodeUnicodeUTF16(text) { return text.split('').map(c => '\\u{' + c.charCodeAt(0).toString(16) + '}').join(''); }
+            decodeUnicodeUTF16(text) { return text.replace(/\\u\{([0-9a-fA-F]+)\}/g, (_, unicode) => String.fromCharCode(parseInt(unicode, 16))); }
+            
+            applyAdvancedOptions(text) {
+                let result = text;
+                // These options are applied sequentially. Order can matter.
+                if (document.getElementById('caseCapitalize').checked) { result = result.charAt(0).toUpperCase() + result.slice(1); }
+                if (document.getElementById('caseUpper').checked) { result = result.toUpperCase(); }
+                if (document.getElementById('caseMixed').checked) { result = result.split('').map((c, i) => i % 2 === 0 ? c.toLowerCase() : c.toUpperCase()).join(''); }
+                if (document.getElementById('caseRandom').checked) { result = result.split('').map(c => Math.random() > 0.5 ? c.toUpperCase() : c.toLowerCase()).join(''); }
+                
+                // New Whitespace logic: only one can be applied. Priority order.
+                if (document.getElementById('wsTab').checked) { result = result.replace(/\s/g, '\t'); }
+                else if (document.getElementById('wsNewline').checked) { result = result.replace(/\s/g, '\n'); }
+                else if (document.getElementById('wsCarriageReturn').checked) { result = result.replace(/\s/g, '\r'); }
+                else if (document.getElementById('wsFormFeed').checked) { result = result.replace(/\s/g, '\f'); }
+                else if (document.getElementById('wsSpace').checked) { result = result.replace(/ /g, '\u00A0'); } // Replace standard space with non-breaking space
+                
+                if (document.getElementById('splitKeyword').checked) { result = result.replace(/script/gi, 'scr<!---->ipt').replace(/alert/gi, 'al<!---->ert'); }
+                if (document.getElementById('attrInjection').checked) { result = result.replace(/<script/gi, '<sc\r\ni\r\npt'); }
+                if (document.getElementById('commentInsert').checked) { result = result.replace(/</g, '<!-- --> < <!-- -->'); }
+                if (document.getElementById('zeroWidth').checked) { result = result.split('').join('\u200B'); }
+                if (document.getElementById('homograph').checked) { const h={'a':'а','e':'е','o':'о','p':'р','c':'с','x':'х','y':'у'}; result = result.replace(/[aeopcxy]/gi, c => h[c.toLowerCase()] || c); }
+                if (document.getElementById('rtlOverride').checked) { result = '\u202E' + result + '\u202C'; }
+                
+                // New bypass techniques
+                if (document.getElementById('stringConcat').checked) {
+                    const keywords = ['script', 'alert', 'document', 'cookie', 'window', 'location', 'eval'];
+                    keywords.forEach(kw => {
+                        const regex = new RegExp(kw, 'gi');
+                        const concat = "'" + kw.split('').join("'+'") + "'";
+                        result = result.replace(regex, concat);
+                    });
+                }
+                if (document.getElementById('fromCharCode').checked) {
+                    const charCodes = result.split('').map(c => c.charCodeAt(0)).join(',');
+                    result = `String.fromCharCode(${charCodes})`;
+                }
+                return result;
             }
         }
 
-        // Initialize the application when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            new XSSPayloadTool();
-        });
-
-        // Prevent any potential XSS through error handling
-        window.addEventListener('error', (event) => {
-            console.error('Application error:', event.error);
-            event.preventDefault();
-        });
-
-        // Additional security: prevent eval and similar dangerous functions
-        window.eval = function() {
-            throw new Error('eval() is disabled for security');
-        };
+        document.addEventListener('DOMContentLoaded', () => new XSSPayloadTool());
+        window.addEventListener('error', (event) => { console.error('Application error:', event.error); event.preventDefault(); });
+        window.eval = () => { throw new Error('eval() is disabled for security'); };
     </script>
 </body>
-</html> 
+</html>
